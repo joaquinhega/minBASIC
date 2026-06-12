@@ -1,3 +1,9 @@
 node_modules/
 package-lock.json
 input.txt
+
+# ANTLR4 intermediates and build artifacts
+.antlr/
+*.interp
+*.tokens
+*.java
