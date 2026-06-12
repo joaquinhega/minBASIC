@@ -16,7 +16,7 @@ A diferencia de los lenguajes modernos, donde las instrucciones suelen ejecutars
 - Permitir saltos dinámicos mediante la instrucción `GOTO`.
 - Gestionar variables globales y locales utilizando scopes.
 - Soportar expresiones aritméticas, lógicas y relacionales.
-- Proporcionar manejo básico de errores y validaciones de ejecución.
+- Proporcionar manejo de errores y validaciones de ejecución.
 
 ---
 
@@ -57,7 +57,7 @@ Características principales:
 - Ejecución basada en líneas numeradas.
 - Saltos dinámicos mediante `GOTO`.
 - Validación de líneas destino.
-- Protección contra ciclos infinitos mediante límite de iteraciones.
+- Protección contra ciclos infinitos mediante límite de iteraciones (10000).
 
 ### 4. Gestión de Variables y Scopes
 
@@ -73,6 +73,7 @@ Funciones soportadas:
 - Eliminación de ámbitos mediante `ENDSCOPE`.
 - Coerción automática de tipos.
 - Operadores relacionales y lógicos.
+- Validación de variables no inicializadas.
 
 ---
 
@@ -82,11 +83,12 @@ Funciones soportadas:
 MiniTraductor/
 ├── node_modules/         # Dependencias del proyecto
 ├── tools/                # antlr-4.13.2-complete.jar
+├── test/                 # Programas de prueba y documentación de tests
 ├── index.js              # Punto de entrada
 ├── Interpreter.js        # Motor de ejecución
 ├── VisitorImpl.js        # Evaluación semántica
 ├── SymbolTable.js        # Tabla de símbolos y scopes
-├── MiniBASIC.g4          # Gramática del lenguaje
+├── MiniBASIC.g4           # Gramática del lenguaje
 ├── input.txt             # Programa de prueba
 ├── package.json          # Configuración y scripts
 └── README.md             # Documentación
@@ -153,11 +155,12 @@ Implementa la lógica semántica de las instrucciones.
 
 Responsabilidades:
 
-- Evaluar expresiones.
+- Evaluar expresiones (relacionales, aritméticas y factores).
 - Ejecutar asignaciones.
 - Procesar sentencias `PRINT`.
 - Gestionar scopes.
 - Resolver operaciones lógicas y relacionales.
+- Validar división por cero.
 
 ### `SymbolTable.js`
 
@@ -204,42 +207,27 @@ Responsabilidades:
 - Operadores relacionales.
 - Coerción automática de tipos.
 
----
+#### Sprint 4 — Entrega Final
 
-## Tareas Pendientes
+**Extensión de la gramática**
+- Multiplicación (`*`) y división (`/`) agregadas como nuevo nivel de precedencia (`factor`), por encima de `+`/`-`.
 
-### Sprint 4 — Entrega Final
+**Manejo de errores**
+- Validación de división por cero (`Error Aritmético: Division por cero.`).
+- Validación de variables no inicializadas (`Error de Referencia: La variable '...' no ha sido inicializada.`).
+- Detección y aborto seguro de ciclos infinitos (límite de 10000 iteraciones).
 
-#### Manejo de errores
+**Casos de prueba**
 
-Agregar validaciones específicas para:
+Se desarrollaron 4 programas de prueba en `test/`, documentados en `test/README_pruebas.md`:
 
-- División por cero.
-- Operaciones inválidas.
-- Posibles desbordamientos matemáticos.
+1. `programa1_basico.txt` — PRINT, asignaciones, aritmética y `END`.
+2. `programa2_comparaciones_scopes.txt` — operadores relacionales, `BEGIN`/`ENDSCOPE` y `GOTO` hacia adelante.
+3. `programa3_concat_loop.txt` — concatenación de strings, `GOTO` hacia atrás y detección de ciclo infinito.
+4. `programa4_mult_div_error.txt` — multiplicación, división y validación de división por cero.
 
-#### Extensión de la gramática
-
-Evaluar la incorporación de:
-
-- Multiplicación (`*`)
-- División (`/`)
-
-#### Casos de prueba
-
-Desarrollar al menos tres programas de prueba que demuestren:
-
-- Uso de variables.
-- Uso de scopes.
-- Saltos complejos mediante `GOTO`.
-- Operadores relacionales.
-- Conversión automática de tipos.
-
-#### Documentación y revisión
-
-- Limpieza del código.
-- Comentarios finales.
-- Verificación de cumplimiento de la rúbrica.
+**Documentación y revisión**
+- Verificación de cumplimiento de la rúbrica de la Práctica 10.
 - Revisión del informe de entrega.
 
 ---
@@ -264,6 +252,13 @@ Actualmente MiniBASIC soporta:
 - `BEGIN`
 - `ENDSCOPE`
 
+### Operadores aritméticos
+
+- `+` (suma / concatenación)
+- `-` (resta)
+- `*` (multiplicación)
+- `/` (división, con validación de división por cero)
+
 ### Operadores relacionales
 
 - `>`
@@ -274,7 +269,7 @@ Actualmente MiniBASIC soporta:
 
 El intérprete puede:
 
-- Realizar sumas numéricas.
+- Realizar operaciones numéricas (suma, resta, multiplicación, división).
 - Concatenar cadenas de texto.
 - Resolver comparaciones lógicas.
 
@@ -291,6 +286,4 @@ El intérprete puede:
 
 ## Conclusión
 
-El proyecto implementa un intérprete para MiniBASIC basado en una arquitectura modular compuesta por análisis sintáctico, almacenamiento de instrucciones, ejecución dinámica y gestión de memoria mediante scopes.
-
-Actualmente el núcleo funcional se encuentra implementado y solo restan tareas de validación, pruebas finales y documentación para completar la entrega del proyecto.
+El proyecto implementa un intérprete completo para MiniBASIC basado en una arquitectura modular compuesta por análisis sintáctico, almacenamiento de instrucciones, ejecución dinámica y gestión de memoria mediante scopes. Todos los sprints (1 a 4) se encuentran completados, incluyendo operadores aritméticos completos, manejo de errores, casos de prueba documentados y verificación de la rúbrica de entrega.

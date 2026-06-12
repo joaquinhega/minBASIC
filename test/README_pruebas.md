@@ -59,3 +59,19 @@ Iniciando contador...
 10000
 ERROR FATAL EN EJECUCIÓN (Línea 80): Ciclo infinito detectado (Excedidas las 10000 iteraciones).
 ```
+
+---
+
+## programa4_mult_div_error.txt
+
+Demuestra las operaciones de multiplicación y división, junto con la validación de división por cero:
+- Multiplicación (`X * Y`)
+- División (`X / Y`)
+- Detección y aborto seguro al intentar dividir por cero (`X / 0`)
+
+**Salida esperada:**
+```
+8
+2
+ERROR FATAL EN EJECUCIÓN (Línea 60): Error Aritmético: Division por cero.
+```

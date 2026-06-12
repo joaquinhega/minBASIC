@@ -79,11 +79,11 @@ export default class VisitorImpl extends MiniBASICVisitor {
   // 2. Nivel Aritmético / Concatenación
   evaluarAritmetica(ctx) {
     if (!ctx.aritmetica()) {
-      return this.evaluarTermino(ctx.termino());
+      return this.evaluarFactor(ctx.factor());
     }
 
     const izquierda = this.evaluarAritmetica(ctx.aritmetica());
-    const derecha = this.evaluarTermino(ctx.termino());
+    const derecha = this.evaluarFactor(ctx.factor());
 
     if (ctx.SUMA()) {
       // Delegamos a la tabla de símbolos para soportar coerción (suma vs concatenación)
@@ -92,6 +92,29 @@ export default class VisitorImpl extends MiniBASICVisitor {
     
     if (ctx.RESTA()) {
       return izquierda - derecha;
+    }
+
+    return izquierda;
+  }
+
+  // 2.5 Nivel Factor: Multiplicación / División (mayor precedencia)
+  evaluarFactor(ctx) {
+    if (!ctx.factor()) {
+      return this.evaluarTermino(ctx.termino());
+    }
+
+    const izquierda = this.evaluarFactor(ctx.factor());
+    const derecha = this.evaluarTermino(ctx.termino());
+
+    if (ctx.MULT()) {
+      return izquierda * derecha;
+    }
+
+    if (ctx.DIV()) {
+      if (derecha === 0) {
+        throw new Error("Error Aritmético: Division por cero.");
+      }
+      return izquierda / derecha;
     }
 
     return izquierda;

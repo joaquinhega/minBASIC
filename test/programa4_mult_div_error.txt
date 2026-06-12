@@ -1,0 +1,7 @@
+10 X = 4
+20 Y = 2
+30 PRINT X * Y
+40 PRINT X / Y
+50 Z = 0
+60 PRINT X / Z
+70 END

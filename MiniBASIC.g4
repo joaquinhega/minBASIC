@@ -27,7 +27,13 @@ expresion
 
 // Aritmética básica
 aritmetica
-    : aritmetica (SUMA | RESTA) termino
+    : aritmetica (SUMA | RESTA) factor
+    | factor
+    ;
+
+// Multiplicación y división (mayor precedencia)
+factor
+    : factor (MULT | DIV) termino
     | termino
     ;
 
@@ -55,6 +61,8 @@ MAYOR       : '>';
 MENOR       : '<';
 SUMA        : '+';
 RESTA       : '-';
+MULT        : '*';
+DIV         : '/';
 
 // Identificadores y literales
 ID          : [A-Z][A-Z0-9]*;
