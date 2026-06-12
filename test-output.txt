@@ -1,0 +1,17 @@
+Ô£à REQ-2.1: Fase 1 - Carga en Diccionario
+   Ô£à Diccionario de l├¡neas cargado correctamente (3 l├¡neas indexadas)
+
+Ô£à REQ-2.2: Fase 2 - Bucle de Ejecuci├│n Din├ímico
+   Ô£à Bucle secuencial ejecutado (PC avanza en orden)
+
+Ô£à REQ-2.3: Evaluaci├│n de Expresiones Jer├írquicas
+   Ô£à Suma: 5 + 3 = 8
+   Ô£à Resta: 10 - 3 = 7
+   Ô£à Expresi├│n compleja: 10 + 5 - 3 = 12
+
+Ô£à REQ-2.4: Instrucciones Obligatorias
+   Ô£à Asignaci├│n: CONTADOR = 1 ÔåÆ 2
+   Ô£à GOTO: Salta correctamente de l├¡nea 20 a 40
+   Ô£à END: Detiene correctamente la ejecuci├│n
+
+Ô£à Validaciones de Error
