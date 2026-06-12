@@ -1,0 +1,13 @@
+10 X = 5
+20 Y = 10
+30 PRINT X > Y
+40 PRINT X < Y
+50 PRINT X == X
+60 BEGIN
+70 Z = 100
+80 PRINT Z
+90 ENDSCOPE
+100 GOTO 120
+110 PRINT "esto no se imprime"
+120 PRINT "Fin del programa"
+130 END

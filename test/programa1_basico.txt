@@ -1,0 +1,5 @@
+10 PRINT "Hola Mundo"
+20 X = 5
+30 Y = 3
+40 PRINT X + Y
+50 END
