@@ -1,0 +1,13 @@
+{
+  "name": "minibasic-interpreter",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "java -jar tools/antlr-4.13.2-complete.jar -Dlanguage=JavaScript -visitor -no-listener MiniBASIC.g4",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "antlr4": "^4.13.2"
+  }
+}

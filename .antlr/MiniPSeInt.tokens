@@ -1,0 +1,13 @@
+PROCESO=1
+FIN_PROCESO=2
+ESCRIBIR=3
+ASIGNAR=4
+PUNTO_COMA=5
+ID=6
+NUMERO=7
+WS=8
+'Proceso'=1
+'FinProceso'=2
+'Escribir'=3
+'<-'=4
+';'=5
