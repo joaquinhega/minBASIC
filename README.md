@@ -1,112 +1,296 @@
-# Intérprete de MiniBASIC
+# Intérprete de MiniBASIC — Proyecto Final (Teoría de la Computación II)
 
-## ¿Qué es este proyecto?
-MiniBASIC es un intérprete para un lenguaje tipo BASIC, inspirado en la programación retro basada en números de línea y saltos dinámicos. El objetivo del proyecto es analizar un archivo de entrada, construir su árbol sintáctico con ANTLR4 y ejecutar las instrucciones mediante lógica escrita en Node.js.
+## Descripción General
 
-La idea central del lenguaje es que el flujo del programa no depende únicamente del orden físico de las líneas, sino también de instrucciones como `GOTO`, que permiten modificar el punto de ejecución en tiempo real.
+Este proyecto consiste en el desarrollo de un intérprete completo para **MiniBASIC**, un lenguaje inspirado en las primeras versiones de BASIC. El objetivo principal es implementar un entorno capaz de ejecutar programas mediante una **ejecución no secuencial basada en números de línea y saltos dinámicos (`GOTO`)**, manteniendo además un sistema de variables con soporte para ámbitos de ejecución (*scopes*).
 
-## Objetivo general
-El proyecto busca implementar un intérprete capaz de:
+A diferencia de los lenguajes modernos, donde las instrucciones suelen ejecutarse de forma secuencial, MiniBASIC permite alterar el flujo de ejecución durante el tiempo de ejecución mediante saltos hacia cualquier línea válida del programa.
 
-- Leer código fuente desde `input.txt`.
-- Analizar la sintaxis del programa con ANTLR4.
-- Reconocer líneas numeradas e instrucciones válidas.
-- Preparar la base semántica para ejecutar asignaciones, `PRINT`, `GOTO` y `END`.
+---
 
-## Gramática del lenguaje
-La gramática del proyecto está definida en [MiniBASIC.g4](MiniBASIC.g4) y actualmente reconoce las siguientes estructuras:
+## Objetivos
 
-- `PRINT expresion`
-- `ID = expresion`
-- `GOTO NUMERO`
-- `END`
+- Implementar un intérprete funcional para MiniBASIC.
+- Procesar programas utilizando ANTLR4 para el análisis léxico y sintáctico.
+- Ejecutar instrucciones mediante un contador de programa (Program Counter).
+- Permitir saltos dinámicos mediante la instrucción `GOTO`.
+- Gestionar variables globales y locales utilizando scopes.
+- Soportar expresiones aritméticas, lógicas y relacionales.
+- Proporcionar manejo básico de errores y validaciones de ejecución.
 
-### Componentes léxicos
-- `PRINT`, `GOTO`, `END`
-- `ID`
-- `NUMERO`
-- `CADENA`
-- `+`, `-`, `=`
+---
 
-### Estructura de una línea
-Cada línea del programa debe comenzar con un número de línea:
+## Arquitectura del Intérprete
 
-```text
-10 PRINT "HOLA"
-20 X = 5
-30 GOTO 10
-40 END
-```
+El funcionamiento del sistema se divide en distintas etapas.
 
-## Arquitectura del intérprete
-El flujo general del proyecto se organiza en dos etapas:
+### 1. Análisis Léxico y Sintáctico
 
-1. **Análisis sintáctico**
-   - `index.js` lee el contenido de `input.txt`.
-   - Se crean los tokens y el parser de ANTLR4.
-   - Se genera el árbol sintáctico del programa.
+Utilizando **ANTLR4**, el código fuente es procesado en dos pasos:
 
-2. **Interpretación semántica**
-   - `VisitorImpl.js` contiene la base del visitante que recorrerá el árbol.
-   - Allí se mantiene la tabla de líneas y la memoria de variables.
-   - En una etapa posterior se usará esa información para ejecutar el programa con saltos y asignaciones.
+- **Lexer:** transforma los caracteres de entrada en tokens.
+- **Parser:** construye un Árbol de Sintaxis Abstracta (AST) a partir de dichos tokens.
 
-## Estructura del proyecto
+Esta fase garantiza que el programa cumpla con la gramática definida en `MiniBASIC.g4`.
+
+### 2. Carga de Instrucciones
+
+Implementada en `VisitorImpl.js`.
+
+Durante esta etapa se recorre el AST y se almacenan las instrucciones en una estructura de datos denominada `tablaLineas`, donde cada número de línea queda asociado con su instrucción correspondiente.
+
+En esta fase no se ejecuta ninguna instrucción.
+
+### 3. Ejecución Dinámica
+
+Implementada en `Interpreter.js`.
+
+El intérprete utiliza un ciclo de ejecución basado en un **Program Counter (PC)**:
+
+1. Obtiene la línea actual.
+2. Ejecuta la instrucción asociada.
+3. Avanza a la siguiente línea o modifica el PC si encuentra un `GOTO`.
+4. Finaliza cuando encuentra `END`.
+
+Características principales:
+
+- Ejecución basada en líneas numeradas.
+- Saltos dinámicos mediante `GOTO`.
+- Validación de líneas destino.
+- Protección contra ciclos infinitos mediante límite de iteraciones.
+
+### 4. Gestión de Variables y Scopes
+
+Implementada en `SymbolTable.js`.
+
+La tabla de símbolos utiliza una pila de ámbitos (*stack of scopes*) para almacenar variables.
+
+Funciones soportadas:
+
+- Declaración y actualización de variables.
+- Variables globales y locales.
+- Creación de ámbitos mediante `BEGIN`.
+- Eliminación de ámbitos mediante `ENDSCOPE`.
+- Coerción automática de tipos.
+- Operadores relacionales y lógicos.
+
+---
+
+## Estructura del Proyecto
 
 ```text
 MiniTraductor/
-├── index.js
-├── input.txt
-├── MiniBASIC.g4
-├── VisitorImpl.js
-├── package.json
-└── tools/
+├── node_modules/         # Dependencias del proyecto
+├── tools/                # antlr-4.13.2-complete.jar
+├── index.js              # Punto de entrada
+├── Interpreter.js        # Motor de ejecución
+├── VisitorImpl.js        # Evaluación semántica
+├── SymbolTable.js        # Tabla de símbolos y scopes
+├── MiniBASIC.g4          # Gramática del lenguaje
+├── input.txt             # Programa de prueba
+├── package.json          # Configuración y scripts
+└── README.md             # Documentación
 ```
 
-## Requisitos
-Antes de ejecutar el proyecto, necesitas tener instalado:
-
-- Node.js 16 o superior
-- Java JDK 11 o superior
+---
 
 ## Instalación
 
+### Requisitos
+
+- Node.js v16 o superior
+- Java JDK v11 o superior
+
+### Instalación de dependencias
+
 ```bash
-git clone <URL_DE_TU_REPOSITORIO_DE_GITHUB>
-cd MiniTraductor
 npm install
 ```
 
-## Comandos disponibles
-
 ### Compilar la gramática
-Cada vez que se modifique [MiniBASIC.g4](MiniBASIC.g4), recompila los archivos generados con:
+
+Ejecutar únicamente cuando se realicen modificaciones sobre `MiniBASIC.g4`.
 
 ```bash
 npm run build
 ```
 
-Este comando usa ANTLR4 desde la carpeta `tools/` para generar los archivos auxiliares del lexer, parser y visitor.
-
 ### Ejecutar el intérprete
-Para correr el proyecto con el contenido de [input.txt](input.txt):
 
 ```bash
 npm start
 ```
 
-## Desarrollo por etapas
-El proyecto puede organizarse por sprints o hitos de implementación:
+---
 
-- [x] Configuración inicial del repositorio y entorno NPM.
-- [ ] Sprint 1: diseño y ajuste de la gramática.
-- [ ] Sprint 2: implementación del núcleo semántico del visitante.
-- [ ] Sprint 3: validación, manejo de errores y pruebas finales.
+## Componentes Principales
 
-## Estado actual
-En el estado actual del repositorio, la estructura del analizador está preparada y el visitante semántico está listo para ser completado. La base del proyecto ya permite trabajar sobre el parser y extender la ejecución del lenguaje en las siguientes iteraciones.
+### `index.js`
 
-## Notas
-- El archivo de entrada por defecto es [input.txt](input.txt).
-- Los archivos generados por ANTLR4 no deben editarse manualmente.
-- Si cambias la gramática, vuelve a ejecutar `npm run build` antes de `npm start`.
+Coordina todo el flujo de ejecución:
+
+- Lectura del archivo fuente.
+- Inicialización del lexer y parser.
+- Construcción del AST.
+- Creación de la tabla de líneas.
+- Inicio del intérprete.
+
+### `Interpreter.js`
+
+Implementa el ciclo principal de ejecución.
+
+Responsabilidades:
+
+- Mantener el Program Counter.
+- Ejecutar instrucciones.
+- Resolver saltos `GOTO`.
+- Detectar ciclos infinitos.
+- Finalizar la ejecución.
+
+### `VisitorImpl.js`
+
+Implementa la lógica semántica de las instrucciones.
+
+Responsabilidades:
+
+- Evaluar expresiones.
+- Ejecutar asignaciones.
+- Procesar sentencias `PRINT`.
+- Gestionar scopes.
+- Resolver operaciones lógicas y relacionales.
+
+### `SymbolTable.js`
+
+Gestiona las variables del programa.
+
+Responsabilidades:
+
+- Almacenamiento de variables.
+- Búsqueda de identificadores.
+- Gestión de scopes.
+- Conversión de tipos.
+- Actualización de valores.
+
+---
+
+## Estado del Proyecto
+
+### Funcionalidades Implementadas
+
+#### Sprint 1 — Gramática y Pipeline
+
+- Lexer funcional.
+- Parser funcional.
+- Gramática libre de ambigüedades.
+- Integración con ANTLR4.
+
+#### Sprint 2 — Núcleo del Intérprete
+
+- Program Counter.
+- Ejecución dinámica.
+- Instrucciones:
+  - `PRINT`
+  - Asignación (`=`)
+  - `GOTO`
+  - `END`
+- Protección contra loops infinitos.
+
+#### Sprint 3 — Variables y Scopes
+
+- Variables globales.
+- Variables locales.
+- `BEGIN`
+- `ENDSCOPE`
+- Operadores relacionales.
+- Coerción automática de tipos.
+
+---
+
+## Tareas Pendientes
+
+### Sprint 4 — Entrega Final
+
+#### Manejo de errores
+
+Agregar validaciones específicas para:
+
+- División por cero.
+- Operaciones inválidas.
+- Posibles desbordamientos matemáticos.
+
+#### Extensión de la gramática
+
+Evaluar la incorporación de:
+
+- Multiplicación (`*`)
+- División (`/`)
+
+#### Casos de prueba
+
+Desarrollar al menos tres programas de prueba que demuestren:
+
+- Uso de variables.
+- Uso de scopes.
+- Saltos complejos mediante `GOTO`.
+- Operadores relacionales.
+- Conversión automática de tipos.
+
+#### Documentación y revisión
+
+- Limpieza del código.
+- Comentarios finales.
+- Verificación de cumplimiento de la rúbrica.
+- Revisión del informe de entrega.
+
+---
+
+## Características del Lenguaje
+
+Actualmente MiniBASIC soporta:
+
+### Control de flujo
+
+- `GOTO`
+- `END`
+
+### Variables
+
+- Variables enteras
+- Variables booleanas
+- Variables de texto
+
+### Ámbitos
+
+- `BEGIN`
+- `ENDSCOPE`
+
+### Operadores relacionales
+
+- `>`
+- `<`
+- `==`
+
+### Conversión automática de tipos
+
+El intérprete puede:
+
+- Realizar sumas numéricas.
+- Concatenar cadenas de texto.
+- Resolver comparaciones lógicas.
+
+---
+
+## Tecnologías Utilizadas
+
+- JavaScript (Node.js)
+- ANTLR4
+- Java JDK
+- MiniBASIC (lenguaje interpretado)
+
+---
+
+## Conclusión
+
+El proyecto implementa un intérprete para MiniBASIC basado en una arquitectura modular compuesta por análisis sintáctico, almacenamiento de instrucciones, ejecución dinámica y gestión de memoria mediante scopes.
+
+Actualmente el núcleo funcional se encuentra implementado y solo restan tareas de validación, pruebas finales y documentación para completar la entrega del proyecto.
