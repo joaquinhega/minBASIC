@@ -1,47 +1,37 @@
+// 4. Interpreter.js
 /**
  * Interpreter.js
- * Motor de ejecución secuencial del intérprete MiniBASIC
- * Gestiona el Program Counter (PC), contexto global y bucle de ejecución
+ * Motor de ejecución secuencial y dinámico del intérprete MiniBASIC.
+ * Gestiona el Program Counter (PC), el ciclo Fetch-Execute y las excepciones de control.
  */
 
 export default class Interpreter {
-  /**
-   * Constructor del intérprete
-   * @param {VisitorImpl} visitor - Instancia del visitor que contiene tablaLineas y memoria
-   */
   constructor(visitor, maxIteraciones = 10000) {
     this.visitor = visitor;
-    this.tablaLineas = visitor.tablaLineas;      // { numero_linea: nodoInstruccion }
-    this.memoria = visitor.memoria;               // { variable: valor }
-    this.lineasOrdenadas = [];                     // Array ordenado de números de línea
-    this.pc = 0;                                   // Program Counter (índice en lineasOrdenadas)
+    this.tablaLineas = visitor.tablaLineas;
+    this.lineasOrdenadas = [];
+    this.pc = 0;
     this.ejecutando = true;
     this.ultimoError = null;
-    this.iteraciones = 0;                          // Contador de iteraciones
-    this.maxIteraciones = maxIteraciones;          // Límite para detectar ciclos infinitos
+    this.iteraciones = 0;
+    this.maxIteraciones = maxIteraciones;
   }
 
-  /**
-   * Inicia la ejecución del programa
-   * Pre-requisito: visitPrograma ya fue invocado para cargar tablaLineas
-   */
   ejecutar() {
     try {
-      // Obtener líneas ordenadas ascendentemente
       this.lineasOrdenadas = Object.keys(this.tablaLineas)
         .map(Number)
         .sort((a, b) => a - b);
 
       if (this.lineasOrdenadas.length === 0) {
-        console.log("⚠️  Programa vacío");
+        console.log("⚠️ Programa vacío. Nada que ejecutar.");
         return;
       }
 
-      // Bucle principal de ejecución
       while (this.pc < this.lineasOrdenadas.length && this.ejecutando) {
         this.iteraciones++;
         if (this.iteraciones > this.maxIteraciones) {
-          throw new Error(`Ciclo infinito detectado (>  ${this.maxIteraciones} iteraciones)`);
+          throw new Error(`Ciclo infinito detectado (Excedidas las ${this.maxIteraciones} iteraciones).`);
         }
 
         const numeroLinea = this.lineasOrdenadas[this.pc];
@@ -51,46 +41,35 @@ export default class Interpreter {
           this.visitor.ejecutarInstruccion(nodoInstruccion, numeroLinea);
         } catch (error) {
           if (error.message === "END") {
-            // Instrucción END encontrada: termina el programa normalmente
             this.ejecutando = false;
             break;
           } else if (error.message.startsWith("GOTO:")) {
-            // Instrucción GOTO: cambiar el PC
             const destino = parseInt(error.message.substring(5));
             this.pc = this.lineasOrdenadas.indexOf(destino);
             if (this.pc === -1) {
-              throw new Error(`❌ GOTO: Número de línea ${destino} no existe`);
+              throw new Error(`Error de Salto Dinámico: La línea de destino GOTO ${destino} no existe.`);
             }
-            continue;
+            continue; 
           } else {
-            // Error en la ejecución
-            throw error;
+            throw error; 
           }
         }
 
-        // Avanzar al siguiente comando (si no fue un GOTO)
         this.pc++;
       }
 
-      console.log("✅ Programa finalizado correctamente");
+      console.log("\n✅ Ejecución finalizada correctamente.");
     } catch (error) {
       this.ultimoError = error;
-      console.error(`\n❌ ERROR EN EJECUCIÓN (línea ${this.lineasOrdenadas[this.pc] || '?'}): ${error.message}`);
+      console.error(`\n❌ ERROR FATAL EN EJECUCIÓN (Línea ${this.lineasOrdenadas[this.pc] || 'Desconocida'}): ${error.message}`);
       process.exit(1);
     }
   }
 
-  /**
-   * Obtiene el estado actual de la memoria
-   * @returns {Object} Diccionario de variables y sus valores
-   */
   obtenerEstado() {
-    return { ...this.memoria };
+    return this.visitor.obtenerMemoria();
   }
 
-  /**
-   * Detiene la ejecución del programa
-   */
   detener() {
     this.ejecutando = false;
   }
